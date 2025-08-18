@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "834765216321",
+    "project_id": "mythos-66aa2",
+    "storage_bucket": "mythos-66aa2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834765216321:android:c0cdfede0f51035f3f44c0",
+        "android_client_info": {
+          "package_name": "com.mythos.mythos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK4ypC4DnQil04_hk-bIuiQZvKqTgOzoY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

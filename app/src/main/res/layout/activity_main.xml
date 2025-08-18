@@ -21,14 +21,14 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/editTextText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/chatinput"
+        android:layout_width="278dp"
+        android:layout_height="36dp"
         android:background="@drawable/mythoschatinput"
         android:ems="10"
+        android:hint="Escribe aquí..."
         android:inputType="text"
         android:padding="12dp"
-        android:text="Escribe aquí"
         android:textColorHint="#222222"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/rectangle_at_the_top"
@@ -36,4 +36,14 @@
         app:layout_constraintStart_toStartOf="@+id/rectangle_at_the_top"
         app:layout_constraintTop_toTopOf="@+id/rectangle_at_the_top"
         app:layout_constraintVertical_bias="0.51" />
+
+    <Button
+        android:id="@+id/chatsend"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:drawableBottom="@drawable/sendicon"
+        app:layout_constraintBottom_toBottomOf="@+id/rectangle_at_the_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/chatinput"
+        app:layout_constraintTop_toTopOf="@+id/rectangle_at_the_top" />
 </androidx.constraintlayout.widget.ConstraintLayout>
