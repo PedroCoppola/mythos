@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Mythos - AI Story Generator</string>
+    <string name="qu_quieres_hacer_ahora">¿Qué quieres hacer ahora?</string>
 </resources>

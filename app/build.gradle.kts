@@ -73,16 +73,16 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.mediation.test.suite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
-    // Add the dependency for the Firebase AI Logic library (if you are using Firebase Vertex AI for Gemini)
-    // implementation("com.google.firebase:firebase-ai") // Uncomment if using Firebase Vertex AI
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation(libs.firebase.firestore.ktx)
 
-    // For Google AI Gemini SDK (which you are using based on previous code)
-    implementation("com.google.ai.client.generativeai:generativeai:0.3.0") // Check for the latest version
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // For coroutines
+    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
