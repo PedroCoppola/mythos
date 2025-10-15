@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var db: FirebaseFirestore
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,7 +25,9 @@ class LoginActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("MiAppPrefs", Context.MODE_PRIVATE)
         val usuarioGuardado = sharedPref.getString("usuario", null)
         if (usuarioGuardado != null) {
-            val intent = Intent(this, MainActivity::class.java)
+            // ----- ¡CAMBIO CLAVE AQUÍ! -----
+            // Ahora te lleva a la pantalla de perfil, no a la de la historia
+            val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
             finish()
             return
@@ -33,7 +37,9 @@ class LoginActivity : AppCompatActivity() {
         val edtPassword = findViewById<EditText>(R.id.edtPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnIrRegistro = findViewById<Button>(R.id.btnGoRegister)
-        val btnBack = findViewById<Button>(R.id.btnBack)
+        // ESTA LÍNEA ES LA CORRECTA
+        val btnBack: ImageButton = findViewById(R.id.btnBack)
+
 
         db = FirebaseFirestore.getInstance()
 

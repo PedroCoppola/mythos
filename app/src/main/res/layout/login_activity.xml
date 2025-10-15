@@ -3,120 +3,128 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.10"
-        app:layout_constraintHorizontal_bias="0.5"
+    <!-- Fondo -->
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/fondologin" />
+
+    <!-- Overlay oscuro -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000" />
+
+    <!-- Botón volver -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/custom_button"
+        android:contentDescription="Volver"
+        android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintWidth_percent="1">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/custom_button"
-            android:text="Volver"
-            android:textColor="@color/white"
-            app:icon="@drawable/usuario_icono"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.75"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:layout_constraintWidth_percent="0.2" />
+    <!-- Logo centrado -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="269dp"
+        android:layout_height="212dp"
+        android:layout_marginTop="80dp"
+        android:contentDescription="Logo Mythos"
+        android:src="@drawable/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <!-- Caja de login -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#55000000"
+        android:background="@drawable/login_box_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.55"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintWidth_percent="0.95">
-
-        <EditText
-            android:id="@+id/edtPassword"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:ems="10"
-            android:hint="Contraseña"
-            android:background="@drawable/mythoschatinput"
-            android:textColorHint="@color/white"
-            android:paddingLeft="16dp"
-            android:inputType="textPassword"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.15"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.45"
-            app:layout_constraintWidth_percent="0.90" />
+        app:layout_constraintVertical_bias="0.9"
+        app:layout_constraintWidth_percent="0.9">
 
         <EditText
             android:id="@+id/edtUsuario"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:ems="10"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="68dp"
             android:background="@drawable/mythoschatinput"
-            android:paddingLeft="16dp"
-            android:textColorHint="@color/white"
-            android:hint="Nombre de usuario"
-            android:inputType="text"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:fontFamily="@font/notoserif"
+            android:hint="Nombre de usuario o e-mail..."
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.15"
+            app:layout_constraintHorizontal_bias="0.432"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.15"
-            app:layout_constraintWidth_percent="0.90" />
+            app:layout_constraintWidth_percent="0.9" />
+
+        <EditText
+            android:id="@+id/edtPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/mythoschatinput"
+            android:hint="Contraseña..."
+            android:fontFamily="@font/notoserif"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/edtUsuario"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp"
+            app:layout_constraintWidth_percent="0.9" />
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
             android:background="@drawable/custom_button"
-            android:text="Iniciar Sesión"
-            android:textColor="@color/white"
-            app:icon="@drawable/usuario_icono"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:fontFamily="@font/notoserif"
+            android:text="Ingresar"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.15"
+            app:layout_constraintHorizontal_bias="0.493"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.75"
-            app:layout_constraintWidth_percent="0.50" />
+            app:layout_constraintTop_toBottomOf="@id/edtPassword"
+            app:layout_constraintWidth_percent="0.6" />
 
         <Button
             android:id="@+id/btnGoRegister"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:background="@drawable/custom_button"
+            android:fontFamily="@font/notoserif"
             android:text="Registrarme"
-            android:textColor="@color/white"
-            app:icon="@drawable/usuario_icono"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.15"
+            app:layout_constraintHorizontal_bias="0.493"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.97"
-            app:layout_constraintWidth_percent="0.4" />
+            app:layout_constraintTop_toBottomOf="@id/btnLogin"
+            app:layout_constraintWidth_percent="0.6" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

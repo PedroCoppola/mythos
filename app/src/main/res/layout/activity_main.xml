@@ -10,20 +10,70 @@
     android:backgroundTintMode="src_atop"
     tools:context=".MainActivity">
 
-    <!-- Chat messages area -->
+    <!-- ============================================================= -->
+    <!-- HEADER AREA: Contiene el título y el botón de Login           -->
+    <!-- ============================================================= -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_area"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#1c1e21"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Your existing input area, I've wrapped it in a ConstraintLayout for positioning -->
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="serif"
+            android:text="Tu Historia"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnGoLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/btnGoLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/custom_button"
+            android:minHeight="48dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Login"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ============================================================= -->
+    <!-- CHAT RECYCLER VIEW: Ahora se ajusta entre el header y el input -->
+    <!-- ============================================================= -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
-        android:layout_width="411dp"
-        android:layout_height="651dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/input_area_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_area"
         tools:listitem="@layout/item_chat_message" />
 
+    <!-- ============================================================= -->
+    <!-- INPUT AREA: Se mantiene en la parte inferior                  -->
+    <!-- ============================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/input_area_container"
         android:layout_width="0dp"
@@ -41,7 +91,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:autofillHints=""
             android:background="@drawable/mythoschatinput"
             android:ems="10"
             android:fontFamily="serif"
@@ -53,40 +102,21 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/chatsend"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/chatsend"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/custom_button"
             android:text="Enviar"
             android:textColor="@color/white"
-            android:textSize="16dp"
             app:layout_constraintBottom_toBottomOf="@+id/chatinput"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.75"
-            app:layout_constraintTop_toTopOf="@+id/chatinput"
-            app:layout_constraintWidth_percent="0.2" />
+            app:layout_constraintTop_toTopOf="@+id/chatinput" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <Button
-        android:id="@+id/btnGoLogin"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/custom_button"
-        android:text="Login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.08"
-        android:textColor="@color/white"
-        app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.02"
-        app:layout_constraintWidth_percent="0.25" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,39 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#B06C05"/>
-            <corners android:radius="16dp"/>
-        </shape>
-    </item>
-    <item android:bottom="4dp">
-        <shape android:shape="rectangle">
-            <solid android:color="#FFBC29"/>
-            <corners android:radius="16dp"/>
-        </shape>
-    </item>
-    <item android:bottom="40dp">
-        <shape android:shape="rectangle">
-            <solid android:color="#FFD053"/>
-            <corners
-                android:topLeftRadius="16dp"
-                android:topRightRadius="16dp"/>
-        </shape>
-    </item>
-    <item android:bottom="4dp">
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent"/>
-            <stroke android:width="3dp" android:color="#F6E47D"/>
-            <corners android:radius="16dp"/>
-        </shape>
-    </item>
-    <item android:top="3dp" android:bottom="4dp">
-        <shape android:shape="rectangle">
-            <gradient
-                android:startColor="#55FFAC0C"
-                android:endColor="#99FF8C05"
-                android:angle="270"/>
-            <corners android:radius="16dp"/>
-        </shape>
-    </item>
-</layer-list>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- 1. El gradiente de fondo, con el color principal que pediste -->
+    <gradient
+        android:angle="270"
+        android:endColor="#eeba2b"
+        android:startColor="#FFD053"
+        android:type="linear" />
+
+    <!-- 2. El borde, con el color específico que definiste -->
+    <stroke
+        android:width="2dp"
+        android:color="#edae49" />
+
+    <!-- 3. Las puntas redondeadas en "medio círculo" -->
+    <!-- Un valor de radio muy alto asegura que se vea como un semicírculo perfecto -->
+    <corners android:radius="100dp" />
+
+</shape>

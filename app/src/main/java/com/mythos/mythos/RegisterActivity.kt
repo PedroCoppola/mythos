@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,7 +20,9 @@ class RegisterActivity : AppCompatActivity() {
         val edtUsuario = findViewById<EditText>(R.id.edtUsuarioRegistro)
         val edtPassword = findViewById<EditText>(R.id.edtPasswordRegistro)
         val btnRegistrar = findViewById<Button>(R.id.btnRegister)
-        val btnBack = findViewById<Button>(R.id.btnBack)
+        // ESTA LÍNEA ES LA CORRECTA
+        val btnBack: ImageButton = findViewById(R.id.btnBack)
+
 
         db = FirebaseFirestore.getInstance()
 
