@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import com.mythos.mythos.BuildConfig
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupApiKeyAndInitializeModel() {
         retrievedApiKey = BuildConfig.GEMINI_API_KEY
-        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "YOUR_API_KEY_HERE") {
+        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "AIzaSyAgWMYjXG3NtmybCgupi33_9JLxmrQQMdk") {
             Log.e("GeminiAI", "API Key no configurada o inválida.")
             addMessageToChat(ChatMessage("Error: API Key no configurada.", Sender.MODEL))
         } else {

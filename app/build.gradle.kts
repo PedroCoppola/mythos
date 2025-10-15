@@ -38,10 +38,10 @@ android {
         }
 
         // Crea el campo en BuildConfig. Gradle se encarga de que las comillas sean correctas.
-        buildConfigField("String", "GEMINI_API_KEY", "\"$apiKey\"")
-        // --- END: Leer API key ---
-    }
-
+// Forma SEGURA, usando la variable que leíste arriba
+// Usamos la variable 'apiKey' que ya leíste de local.properties
+// Usamos el formato $variable para inyectar el valor.
+        buildConfigField("String", "GEMINI_API_KEY", "\"$apiKey\"")    }
 
     buildFeatures {
         buildConfig = true
