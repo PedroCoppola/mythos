@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import com.mythos.mythos.BuildConfig
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,43 +33,41 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge() // A menudo no es necesario si manejas los insets manualmente
         setContentView(R.layout.activity_main)
 
+        // 1. Configuración de la UI (es lo primero, siempre debe funcionar)
+        setupUI()
+
+        // 2. Lógica Principal: Iniciar el modelo de IA
+        startAdventure()
+    }
+
+    private fun setupUI() {
         // Inicialización de Vistas
         chatInputEditText = findViewById(R.id.chatinput)
         sendButton = findViewById(R.id.chatsend)
         chatRecyclerView = findViewById(R.id.chat_recycler_view)
         goLoginButton = findViewById(R.id.btnGoLogin)
 
-        // Configuración Inicial
-        setupRecyclerView()
-        setupApiKeyAndInitializeModel()
-        setupClickListeners()
-        setupWindowInsets()
-    }
-
-    private fun setupRecyclerView() {
+        // Configuración del RecyclerView
         chatAdapter = ChatAdapter(chatMessages)
         chatRecyclerView.layoutManager = LinearLayoutManager(this).apply {
             stackFromEnd = true
         }
         chatRecyclerView.adapter = chatAdapter
-    }
 
-    private fun setupApiKeyAndInitializeModel() {
-        retrievedApiKey = BuildConfig.GEMINI_API_KEY
-        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "AIzaSyAgWMYjXG3NtmybCgupi33_9JLxmrQQMdk") {
-            Log.e("GeminiAI", "API Key no configurada o inválida.")
-            addMessageToChat(ChatMessage("Error: API Key no configurada.", Sender.MODEL))
-        } else {
-            initializeGenerativeModel("gemini-2.5-flash") // O el modelo que prefieras
-        }
-    }
-
-    private fun setupClickListeners() {
         goLoginButton.setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java)) // Llévalo al perfil si ya está logueado
+            // 1. Creamos una intención explícita para ir al Perfil.
+            val intent = Intent(this, ProfileActivity::class.java)
+
+            // 2. AÑADIMOS UNA FLAG MÁGICA:
+            // Esto le dice al sistema: "Si ya hay una instancia de ProfileActivity
+            // en la pila, simplemente tráela al frente en lugar de crear una nueva".
+            // Esto previene que se apilen múltiples pantallas de perfil.
+            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+
+            // 3. Lanzamos la actividad.
+            startActivity(intent)
         }
         sendButton.setOnClickListener { sendMessage() }
         chatInputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -80,25 +77,55 @@ class MainActivity : AppCompatActivity() {
             }
             false
         }
+
+        // Configuración de los Insets (para el teclado)
+        setupWindowInsets()
     }
 
-    private fun initializeGenerativeModel(modelToUse: String) {
-        // Limpiamos mensajes anteriores de cualquier sesión previa
-        chatMessages.clear()
-        chatAdapter.notifyDataSetChanged()
+    private fun startAdventure() {
+        // ----- PASO 1: VERIFICAR LA API KEY -----
+        retrievedApiKey = BuildConfig.GEMINI_API_KEY
+        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "YOUR_API_KEY_HERE") {
+            Log.e("GeminiAI", "API Key no configurada o inválida.")
+            // Limpiamos la lista y añadimos un ÚNICO mensaje de error.
+            runOnUiThread {
+                chatMessages.clear()
+                chatAdapter.notifyDataSetChanged()
+                addMessageToChat(ChatMessage("Error: La API Key no está configurada en el proyecto.", Sender.MODEL))
+            }
+            return // Detenemos la ejecución aquí. La UI está lista pero la IA no continuará.
+        }
 
-        // Mostramos el estado de carga INMEDIATAMENTE
-        addMessageToChat(ChatMessage("Forjando una nueva leyenda...", Sender.MODEL, isLoading = true))
+        // ----- PASO 2: DECIDIR EL TIPO DE PROMPT -----
+        val gameMode = intent.getStringExtra("GAME_MODE")
+        val systemPrompt = if (gameMode == "CUSTOM") {
+            // Partida personalizada
+            val context = intent.getStringExtra("GAME_CONTEXT") ?: "un mundo misterioso"
+            val character = intent.getStringExtra("GAME_CHARACTER") ?: "un aventurero sin nombre"
+            val toneValue = intent.getIntExtra("GAME_TONE", 50)
+            val dialogueValue = intent.getIntExtra("GAME_DIALOGUE", 50)
+            buildCustomPrompt(context, character, toneValue, dialogueValue)
+        } else {
+            // Partida rápida/aleatoria por defecto
+            buildDefaultPrompt()
+        }
+
+        // ----- PASO 3: INICIALIZAR EL MODELO CON EL PROMPT CORRECTO -----
+        initializeGenerativeModel("gemini-2.5-flash", systemPrompt)
+    }
+
+    private fun initializeGenerativeModel(modelToUse: String, systemPrompt: String) {
+        // 1. PREPARACIÓN DE LA UI PARA LA CARGA
+        // Este bloque ahora es el único responsable de limpiar y preparar la lista.
+        runOnUiThread {
+            chatMessages.clear()
+            chatAdapter.notifyDataSetChanged()
+            addMessageToChat(ChatMessage("Forjando una nueva leyenda...", Sender.MODEL, isLoading = true))
+        }
 
         Log.i("GeminiAI", "Intentando inicializar modelo: $modelToUse")
         try {
-            val systemPrompt = """
-            Eres un Dungeon Master narrando una historia en español. El jugador es el protagonista, y debes contarle la historia a este a través de la segunda persona.
-            Debes contar la historia a través de la perspectiva del jugador, comunicándole lo que puede ver, diferentes cosas de interés en relación a la historia, y debes darle al usuario diferentes posibles caminos qué tomar en la historia, de manera indirecta, es decir, ya implementado en la historia, puedes remarcar caminos, personajes, objetos, etc., que el usuario puede o no decidir inspeccionar, repito, de manera indirecta, implementada en la historia, y sin querer mover al usuario en ninguna decisión en particular, es importante que el usuario sea el que decide las decisiones del personaje y que no decidas nada de lo que hace el usuario sin su consentimiento.
-            También guías los eventos del mundo. No reveles que eres una IA. Mantén respuestas claras y breves (3-5 oraciones).
-            Comienza la aventura ahora con una introducción breve y una situación inicial para el jugador.
-            """.trimIndent()
-
+            // 2. INICIALIZACIÓN DEL MODELO
             generativeModel = GenerativeModel(
                 modelName = modelToUse,
                 apiKey = retrievedApiKey!!,
@@ -111,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 systemInstruction = content("system") { text(systemPrompt) }
             )
 
-            // Generamos la primera respuesta de la IA en una corutina
+            // 3. GENERACIÓN DE LA PRIMERA RESPUESTA
             lifecycleScope.launch {
                 try {
                     val firstResponse = generativeModel!!.generateContent("Comienza la aventura.")
@@ -124,7 +151,7 @@ class MainActivity : AppCompatActivity() {
                                 content(role = "model") { text(firstAIMessage) }
                             )
                         )
-                        // Actualizamos el mensaje de "cargando" con la historia real
+                        // 4. ACTUALIZACIÓN SEGURA con el resultado
                         addMessageToChat(ChatMessage(firstAIMessage, Sender.MODEL), true)
                     } else {
                         throw IllegalStateException("La respuesta inicial de la IA fue nula o vacía.")
@@ -140,6 +167,49 @@ class MainActivity : AppCompatActivity() {
             generativeModel = null
             chat = null
         }
+    }
+
+
+    // --- El resto de las funciones (buildDefaultPrompt, buildCustomPrompt, sendMessage, addMessageToChat, setupWindowInsets) permanecen exactamente iguales ---
+
+    private fun buildDefaultPrompt(): String {
+        return """
+        Eres un Dungeon Master narrando una historia en español. El jugador es el protagonista, y debes contarle la historia a este a través de la segunda persona.
+        No reveles que eres una IA. Mantén respuestas claras y breves (3-5 oraciones).
+        Comienza la aventura ahora con una introducción breve y una situación inicial para el jugador, inventando un escenario original cada vez.
+        """.trimIndent()
+    }
+
+    private fun buildCustomPrompt(context: String, character: String, toneValue: Int, dialogueValue: Int): String {
+        val toneDescription = when {
+            toneValue < 33 -> "profundamente serio y dramático"
+            toneValue > 66 -> "muy cómico, ligero y hasta absurdo"
+            else -> "balanceado, con momentos serios y toques de humor"
+        }
+
+        val dialogueDescription = when {
+            dialogueValue < 33 -> "casi puramente narrativo, con muy pocos diálogos. Enfócate en las descripciones y acciones"
+            dialogueValue > 66 -> "muy conversacional. La historia debe avanzar principalmente a través de diálogos con otros personajes"
+            else -> "balanceado entre narrativa y diálogo"
+        }
+
+        return """
+        Eres un Dungeon Master narrando una historia en español. Sigue estas reglas ESTRICTAMENTE:
+
+        1.  **Rol del Jugador:** El jugador es el protagonista. Nárra la historia en segunda persona (ej: "Tú ves...", "Sientes..."). El jugador es quien toma TODAS las decisiones. No asumas ninguna acción por él.
+
+        2.  **Contexto del Mundo:** La historia ocurre aquí: "${if (context.isNotBlank()) context else "un mundo de fantasía genérico"}".
+
+        3.  **Identidad del Protagonista:** El jugador es: "${if (character.isNotBlank()) character else "un aventurero anónimo"}". Debes reflejar esta identidad en la narración.
+
+        4.  **Tono de la Historia:** El tono debe ser ${toneDescription}.
+
+        5.  **Estilo Narrativo:** El estilo debe ser ${dialogueDescription}.
+
+        6.  **Formato:** Mantén respuestas claras y breves (3-5 oraciones). No reveles que eres una IA.
+
+        Comienza la aventura ahora con una introducción breve y una situación inicial para el jugador, respetando todos los puntos anteriores.
+        """.trimIndent()
     }
 
     private fun sendMessage() {
@@ -169,13 +239,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ----- NUEVA Y ÚNICA FUNCIÓN PARA AÑADIR/ACTUALIZAR MENSAJES -----
     private fun addMessageToChat(message: ChatMessage, isUpdate: Boolean = false) {
         runOnUiThread {
             if (isUpdate && chatMessages.isNotEmpty()) {
                 chatAdapter.updateLastMessage(message)
             } else {
-                chatAdapter.addMessage(message)
+                // Previene añadir duplicados si la lista ya tiene un mensaje de carga.
+                if (chatMessages.none { it.isLoading }) {
+                    chatAdapter.addMessage(message)
+                }
             }
             if (chatAdapter.itemCount > 0) {
                 chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)

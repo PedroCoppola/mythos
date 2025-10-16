@@ -41,6 +41,13 @@
             android:name=".RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.MythosAIStoryGenerator" />
+
+        <activity
+            android:name=".CreateGameActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MythosAIStoryGenerator"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:padding="24dp"
+    tools:context=".CreateGameActivity">
+
+    <!-- Título de la pantalla -->
+    <TextView
+        android:id="@+id/tvCreateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/notoserif"
+        android:text="Crear Nueva Aventura"
+        android:textColor="@android:color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 1. Campo para el CONTEXTO de la historia -->
+    <TextView
+        android:id="@+id/labelContext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="¿Dónde ocurre la historia?"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCreateTitle" />
+
+    <EditText
+        android:id="@+id/etContext"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/mythoschatinput"
+        android:fontFamily="@font/notoserif"
+        android:gravity="top"
+        android:hint="Ej: En el siglo 41, la humanidad ha colonizado Marte. Eres un detective en una ciudad cyberpunk llena de..."
+        android:inputType="textMultiLine"
+        android:padding="12dp"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/darker_gray"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelContext" />
+
+    <!-- 2. Campo para el PERSONAJE -->
+    <TextView
+        android:id="@+id/labelCharacter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="¿Quién eres?"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etContext" />
+
+    <EditText
+        android:id="@+id/etCharacter"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/mythoschatinput"
+        android:fontFamily="@font/notoserif"
+        android:gravity="top"
+        android:hint="Ej: Me llamo Ignamund, un caballero caído en desgracia que busca redimir su honor..."
+        android:inputType="textMultiLine"
+        android:padding="12dp"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/darker_gray"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelCharacter" />
+
+    <!-- 3. Slider para el TONO -->
+    <TextView
+        android:id="@+id/labelTone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Tono de la historia"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etCharacter" />
+
+    <SeekBar
+        android:id="@+id/seekTone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        android:progress="50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelTone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Serio"
+        android:textColor="#AAAAAA"
+        app:layout_constraintStart_toStartOf="@id/seekTone"
+        app:layout_constraintTop_toBottomOf="@id/seekTone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cómico"
+        android:textColor="#AAAAAA"
+        app:layout_constraintEnd_toEndOf="@id/seekTone"
+        app:layout_constraintTop_toBottomOf="@id/seekTone" />
+
+    <!-- 4. Slider para el DIÁLOGO -->
+    <TextView
+        android:id="@+id/labelDialogue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Cantidad de Diálogo"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/seekTone" />
+
+    <SeekBar
+        android:id="@+id/seekDialogue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        android:progress="50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelDialogue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Narrativo"
+        android:textColor="#AAAAAA"
+        app:layout_constraintStart_toStartOf="@id/seekDialogue"
+        app:layout_constraintTop_toBottomOf="@id/seekDialogue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conversacional"
+        android:textColor="#AAAAAA"
+        app:layout_constraintEnd_toEndOf="@id/seekDialogue"
+        app:layout_constraintTop_toBottomOf="@id/seekDialogue" />
+
+    <!-- Botón para iniciar la partida -->
+    <Button
+        android:id="@+id/btnStartNewGame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/notoserif"
+        android:padding="16dp"
+        android:text="Forjar Aventura"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
