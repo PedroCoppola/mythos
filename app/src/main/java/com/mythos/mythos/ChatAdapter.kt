@@ -23,6 +23,12 @@ class ChatAdapter(private val messages: MutableList<ChatMessage>) :
         return MessageViewHolder(view)
     }
 
+    fun updateMessages(newMessages: List<ChatMessage>) {
+        messages.clear()
+        messages.addAll(newMessages)
+        notifyDataSetChanged() // Notifica al adapter que todo cambió.
+    }
+
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
         val context = holder.itemView.context

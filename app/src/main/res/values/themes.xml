@@ -1,9 +1,42 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MythosAIStoryGenerator" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Tema Principal de la Aplicación -->
+    <style name="Theme.Mythos" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colores Primarios (para highlights, FABs, etc.) -->
+        <item name="colorPrimary">@color/mythos_yellow</item>
+        <item name="colorPrimaryVariant">@color/mythos_yellow_dark</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- Colores de Fondo y Superficies -->
+        <item name="android:windowBackground">@color/mythos_base_gray</item>
+        <item name="colorSurface">@color/mythos_highlight_gray</item>
+
+        <!-- Fuente por Defecto para toda la App -->
+        <item name="android:fontFamily">@font/notoserif_family</item>
+        <item name="fontFamily">@font/notoserif_family</item>
+
+        <!-- Color del texto -->
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <!-- Color de fondo del diálogo -->
+        <item name="android:background">@color/mythos_highlight_gray</item>
+
+        <!-- Color del texto del título -->
+        <item name="android:textColorPrimary">@color/mythos_yellow</item>
+
+        <!-- Color del texto del mensaje -->
+        <item name="android:textColorSecondary">@color/white</item>
+
+        <!-- Estilo de los botones -->
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialog.Button</item>
     </style>
 
-    <style name="Theme.MythosAIStoryGenerator" parent="Base.Theme.MythosAIStoryGenerator" />
+    <!-- Estilo para los botones dentro del diálogo -->
+    <style name="AlertDialog.Button" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <!-- Color del texto de los botones (ej: "Borrar", "Cancelar") -->
+        <item name="android:textColor">@color/mythos_yellow</item>
+    </style>
+
+
 </resources>

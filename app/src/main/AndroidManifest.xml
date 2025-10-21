@@ -10,43 +10,49 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/mythos"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MythosAIStoryGenerator">
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+        android:theme="@style/Theme.Mythos">
 
+        <!-- CORRECCIÓN 1: HomePageActivity es la ÚNICA actividad de inicio (LAUNCHER) -->
         <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
+            android:name=".HomePageActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- Dentro de la etiqueta <application> -->
 
+        <!-- CORRECCIÓN 2: MainActivity ya NO es una actividad de inicio -->
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <!-- Se quitó el intent-filter de aquí -->
+
+        <!-- CORRECCIÓN 3: Todas las demás activities usan el tema unificado "Theme.Mythos" -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false"
-            android:theme="@style/Theme.MythosAIStoryGenerator" />
+            android:theme="@style/Theme.Mythos" />
 
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.MythosAIStoryGenerator" />
+            android:theme="@style/Theme.Mythos" />
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:theme="@style/Theme.MythosAIStoryGenerator" />
+            android:theme="@style/Theme.Mythos" />
 
         <activity
             android:name=".CreateGameActivity"
             android:exported="false"
-            android:theme="@style/Theme.MythosAIStoryGenerator"
+            android:theme="@style/Theme.Mythos"
             android:windowSoftInputMode="adjustResize" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
 
     </application>
 

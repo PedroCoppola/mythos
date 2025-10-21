@@ -1,122 +1,101 @@
 package com.mythos.mythos
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ProfileActivity : AppCompatActivity() {
 
+    private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    // Este es el "receptor" moderno para los datos que vuelven de CreateGameActivity.
-    // Está diseñado para esperar un resultado.
-    private val createGameLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            // Recibimos los datos de la partida personalizada
-            val data: Intent? = result.data
-
-            // Creamos un nuevo Intent para MainActivity, pasando TODOS los datos que recibimos
-            val mainActivityIntent = Intent(this, MainActivity::class.java).apply {
-                // Usamos 'putExtras' para copiar todo el paquete de datos de una vez
-                data?.extras?.let { putExtras(it) }
-            }
-            startActivity(mainActivityIntent)
-        }
-    }
+    private lateinit var tvUserEmail: TextView
+    private lateinit var tvUsername: TextView
+    private lateinit var tvGamesCreatedCount: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Referencias a los elementos de la UI
-        val tvUsername: TextView = findViewById(R.id.tvUsername)
-        val tvCreationDate: TextView = findViewById(R.id.tvCreationDate)
-        val btnStartStory: Button = findViewById(R.id.btnStartStory)
+        // Vistas
+        tvUserEmail = findViewById(R.id.tvUserEmail)
+        tvUsername = findViewById(R.id.tvUsername)
+        tvGamesCreatedCount = findViewById(R.id.tvGamesCreatedCount)
         val btnLogout: Button = findViewById(R.id.btnLogout)
-        val btnGoToCreateGame: Button = findViewById(R.id.btnGoToCreateGame)
+        val btnBack: ImageButton = findViewById(R.id.btnBack)
 
-        // 1. Obtener los datos de la sesión guardada
-        val sharedPref = getSharedPreferences("MiAppPrefs", Context.MODE_PRIVATE)
-        val username = sharedPref.getString("usuario", null)
+        // Listeners
+        btnBack.setOnClickListener {
+            finish()
+        }
 
-        // Si por alguna razón no hay usuario, no deberíamos estar aquí. Volvemos al login.
-        if (username == null) {
-            goLogin()
+        btnLogout.setOnClickListener {
+            signOut()
+        }
+
+        loadUserProfile()
+    }
+
+    private fun loadUserProfile() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            // Si por alguna razón llega acá sin estar logueado, lo mandamos a la home.
+            Toast.makeText(this, "No hay sesión activa.", Toast.LENGTH_SHORT).show()
+            goToHomePage()
             return
         }
 
-        // 2. Mostrar datos y cargar fecha desde Firestore
-        tvUsername.text = username
-        loadUserCreationDate(username)
+        // --- Cargar datos del usuario desde Firestore ---
+        tvUserEmail.text = currentUser.email ?: "Email no disponible"
 
-        // 3. Configurar los botones
-
-        // --- ¡¡¡ ESTE ES EL CAMBIO CLAVE Y CORREGIDO !!! ---
-        btnGoToCreateGame.setOnClickListener {
-            val intent = Intent(this, CreateGameActivity::class.java)
-            // Usamos el launcher que está diseñado para esperar un resultado.
-            createGameLauncher.launch(intent)
-        }
-
-        // Botón para iniciar una partida RÁPIDA (sin parámetros)
-        btnStartStory.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Botón para cerrar sesión
-        btnLogout.setOnClickListener {
-            // Borrar los datos de la sesión guardada en el dispositivo
-            sharedPref.edit().remove("usuario").apply()
-
-            // Mostrar un mensaje de confirmación
-            Toast.makeText(this, "Has cerrado sesión", Toast.LENGTH_SHORT).show()
-
-            // Navegar de vuelta a la pantalla de login
-            goLogin()
-        }
-    }
-
-    private fun loadUserCreationDate(username: String) {
-        val tvCreationDate: TextView = findViewById(R.id.tvCreationDate)
-
-        db.collection("usuarios").document(username).get()
+        // Cargar nombre de usuario desde la colección "usuarios"
+        db.collection("usuarios").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val timestamp = document.getTimestamp("fechaCreacion")
-                    if (timestamp != null) {
-                        val date: Date = timestamp.toDate()
-                        val formatter = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
-                        tvCreationDate.text = "Miembro desde el ${formatter.format(date)}"
-                    } else {
-                        tvCreationDate.text = "Fecha de registro no disponible"
-                    }
+                if (document != null && document.exists()) {
+                    val username = document.getString("username") ?: "Aventurero"
+                    tvUsername.text = username
+                } else {
+                    tvUsername.text = "Aventurero Anónimo"
                 }
             }
             .addOnFailureListener {
-                tvCreationDate.text = "No se pudo cargar la fecha"
+                tvUsername.text = "Aventurero"
+            }
+
+        // --- Contar las partidas del usuario ---
+        db.collection("game_sessions")
+            .whereEqualTo("userId", currentUser.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                tvGamesCreatedCount.text = documents.size().toString()
+            }
+            .addOnFailureListener {
+                tvGamesCreatedCount.text = "N/A"
             }
     }
 
-    private fun goLogin() {
-        // Crea una intención para ir a LoginActivity
-        val intent = Intent(this, LoginActivity::class.java)
-        // Estas flags son CRUCIALES: borran el historial de pantallas ("back stack")
-        // para que el usuario no pueda volver a la pantalla de perfil con el botón "atrás"
+
+
+    private fun signOut() {
+        auth.signOut()
+        Toast.makeText(this, "Sesión cerrada.", Toast.LENGTH_SHORT).show()
+        goToHomePage()
+    }
+
+    private fun goToHomePage() {
+        val intent = Intent(this, HomePageActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        finish() // <-- ¡¡¡ESTA LÍNEA ES LA QUE FALTABA Y SOLUCIONA TODO!!!
+        finish()
     }
 }

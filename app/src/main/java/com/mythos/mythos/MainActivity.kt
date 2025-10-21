@@ -3,12 +3,11 @@ package com.mythos.mythos
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,168 +15,313 @@ import com.google.ai.client.generativeai.Chat
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
+    // --- Vistas ---
     private lateinit var chatInputEditText: EditText
-    private lateinit var sendButton: Button
+    private lateinit var sendButton: ImageButton
     private lateinit var chatRecyclerView: RecyclerView
     private lateinit var chatAdapter: ChatAdapter
-    private lateinit var goLoginButton: Button
+    private lateinit var btnBack: ImageButton
+    private lateinit var btnProfile: ImageButton
+    private lateinit var tvStoryTitle: TextView
 
-    private val chatMessages = mutableListOf<ChatMessage>()
+    // --- Lógica y Firebase ---
     private var generativeModel: GenerativeModel? = null
-    private var chat: Chat? = null
     private var retrievedApiKey: String? = null
+    private lateinit var db: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
+    private var currentGameSession: GameSession? = null
+    private val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+    private var chat: Chat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Configuración de la UI (es lo primero, siempre debe funcionar)
-        setupUI()
+        db = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+        retrievedApiKey = BuildConfig.GEMINI_API_KEY
 
-        // 2. Lógica Principal: Iniciar el modelo de IA
-        startAdventure()
+        setupUI()
+        setupListeners()
+        startOrLoadAdventure()
     }
 
     private fun setupUI() {
-        // Inicialización de Vistas
+        btnBack = findViewById(R.id.btnBack)
+        btnProfile = findViewById(R.id.btnProfile)
+        tvStoryTitle = findViewById(R.id.tvStoryTitle)
         chatInputEditText = findViewById(R.id.chatinput)
         sendButton = findViewById(R.id.chatsend)
         chatRecyclerView = findViewById(R.id.chat_recycler_view)
-        goLoginButton = findViewById(R.id.btnGoLogin)
 
-        // Configuración del RecyclerView
-        chatAdapter = ChatAdapter(chatMessages)
-        chatRecyclerView.layoutManager = LinearLayoutManager(this).apply {
-            stackFromEnd = true
-        }
+        chatAdapter = ChatAdapter(mutableListOf())
+        chatRecyclerView.layoutManager = LinearLayoutManager(this).apply { stackFromEnd = true }
         chatRecyclerView.adapter = chatAdapter
-
-        goLoginButton.setOnClickListener {
-            // 1. Creamos una intención explícita para ir al Perfil.
-            val intent = Intent(this, ProfileActivity::class.java)
-
-            // 2. AÑADIMOS UNA FLAG MÁGICA:
-            // Esto le dice al sistema: "Si ya hay una instancia de ProfileActivity
-            // en la pila, simplemente tráela al frente en lugar de crear una nueva".
-            // Esto previene que se apilen múltiples pantallas de perfil.
-            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-
-            // 3. Lanzamos la actividad.
-            startActivity(intent)
-        }
-        sendButton.setOnClickListener { sendMessage() }
-        chatInputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                sendMessage()
-                return@setOnEditorActionListener true
-            }
-            false
-        }
-
-        // Configuración de los Insets (para el teclado)
-        setupWindowInsets()
     }
 
-    private fun startAdventure() {
-        // ----- PASO 1: VERIFICAR LA API KEY -----
-        retrievedApiKey = BuildConfig.GEMINI_API_KEY
-        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "YOUR_API_KEY_HERE") {
-            Log.e("GeminiAI", "API Key no configurada o inválida.")
-            // Limpiamos la lista y añadimos un ÚNICO mensaje de error.
-            runOnUiThread {
-                chatMessages.clear()
-                chatAdapter.notifyDataSetChanged()
-                addMessageToChat(ChatMessage("Error: La API Key no está configurada en el proyecto.", Sender.MODEL))
-            }
-            return // Detenemos la ejecución aquí. La UI está lista pero la IA no continuará.
+    private fun setupListeners() {
+        btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        // ----- PASO 2: DECIDIR EL TIPO DE PROMPT -----
-        val gameMode = intent.getStringExtra("GAME_MODE")
-        val systemPrompt = if (gameMode == "CUSTOM") {
-            // Partida personalizada
-            val context = intent.getStringExtra("GAME_CONTEXT") ?: "un mundo misterioso"
+        btnProfile.setOnClickListener {
+            val intent = if (auth.currentUser != null) {
+                Intent(this, ProfileActivity::class.java)
+            } else {
+                Intent(this, LoginActivity::class.java)
+            }
+            startActivity(intent)
+        }
+
+        sendButton.setOnClickListener { sendMessage() }
+    }
+
+    private fun startOrLoadAdventure() {
+        if (retrievedApiKey.isNullOrEmpty() || retrievedApiKey == "YOUR_API_KEY_HERE") {
+            lifecycleScope.launch { updateChatUI(listOf(ChatMessage("Error: La API Key no está configurada.", Sender.MODEL))) }
+            return
+        }
+
+        val gameIdToLoad = intent.getStringExtra("GAME_ID_TO_LOAD")
+        if (gameIdToLoad != null) {
+            loadExistingGame(gameIdToLoad)
+        } else {
+            // CORRECCIÓN: Recibir todos los parámetros de CreateGameActivity
+            val context = intent.getStringExtra("GAME_CONTEXT") ?: "un mundo de fantasía misterioso"
             val character = intent.getStringExtra("GAME_CHARACTER") ?: "un aventurero sin nombre"
             val toneValue = intent.getIntExtra("GAME_TONE", 50)
             val dialogueValue = intent.getIntExtra("GAME_DIALOGUE", 50)
-            buildCustomPrompt(context, character, toneValue, dialogueValue)
-        } else {
-            // Partida rápida/aleatoria por defecto
-            buildDefaultPrompt()
+            startNewAdventure(context, character, toneValue, dialogueValue)
         }
-
-        // ----- PASO 3: INICIALIZAR EL MODELO CON EL PROMPT CORRECTO -----
-        initializeGenerativeModel("gemini-2.5-flash", systemPrompt)
     }
 
-    private fun initializeGenerativeModel(modelToUse: String, systemPrompt: String) {
-        // 1. PREPARACIÓN DE LA UI PARA LA CARGA
-        // Este bloque ahora es el único responsable de limpiar y preparar la lista.
-        runOnUiThread {
-            chatMessages.clear()
-            chatAdapter.notifyDataSetChanged()
-            addMessageToChat(ChatMessage("Forjando una nueva leyenda...", Sender.MODEL, isLoading = true))
+    private fun startNewAdventure(context: String, character: String, toneValue: Int, dialogueValue: Int) {
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId == null) {
+            Toast.makeText(this, "Debes iniciar sesión para crear una historia.", Toast.LENGTH_LONG).show()
+            finish()
+            return
         }
 
-        Log.i("GeminiAI", "Intentando inicializar modelo: $modelToUse")
-        try {
-            // 2. INICIALIZACIÓN DEL MODELO
-            generativeModel = GenerativeModel(
-                modelName = modelToUse,
-                apiKey = retrievedApiKey!!,
-                generationConfig = generationConfig {
-                    temperature = 0.9f
-                    topK = 1
-                    topP = 1f
-                    maxOutputTokens = 2048
-                },
-                systemInstruction = content("system") { text(systemPrompt) }
-            )
+        val tempTitle = "Nueva Aventura..."
+        tvStoryTitle.text = tempTitle
 
-            // 3. GENERACIÓN DE LA PRIMERA RESPUESTA
-            lifecycleScope.launch {
-                try {
-                    val firstResponse = generativeModel!!.generateContent("Comienza la aventura.")
-                    val firstAIMessage = firstResponse.text
-                    if (!firstAIMessage.isNullOrBlank()) {
-                        Log.i("GeminiAI", "Nueva historia generada: $firstAIMessage")
-                        chat = generativeModel!!.startChat(
-                            history = listOf(
-                                content(role = "user") { text("Comienza la aventura.") },
-                                content(role = "model") { text(firstAIMessage) }
+        currentGameSession = GameSession(
+            metadata = GameMetadata(
+                gameId = UUID.randomUUID().toString(),
+                userId = currentUserId,
+                gameName = tempTitle,
+                summary = "La aventura está a punto de comenzar.",
+                lastUpdated = System.currentTimeMillis(),
+                userContext = context,
+                userCharacter = character,
+                tone = toneValue,
+                dialogueStyle = dialogueValue
+            ),
+            history = mutableListOf()
+        )
+
+        val systemPrompt = buildCustomPrompt(context, character, toneValue, dialogueValue)
+        initializeAndStart(systemPrompt)
+    }
+
+    private fun initializeAndStart(systemPrompt: String) {
+        lifecycleScope.launch { updateChatUI(listOf(ChatMessage("Forjando una nueva leyenda...", Sender.MODEL, isLoading = true))) }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                generativeModel = GenerativeModel(
+                    modelName = "gemini-2.5-flash", apiKey = retrievedApiKey!!,
+                    generationConfig = generationConfig { temperature = 0.9f; topK = 1; topP = 1f; maxOutputTokens = 2048 },
+                    systemInstruction = content("system") { text(systemPrompt) }
+                )
+                chat = generativeModel!!.startChat()
+
+                val firstResponse = chat!!.sendMessage("Comienza la aventura.")
+                val firstAIMessage = firstResponse.text?.trim() ?: "El oráculo no responde..."
+                val firstMessageObject = ChatMessage(firstAIMessage, Sender.MODEL)
+                currentGameSession?.history?.add(firstMessageObject)
+
+                // LÓGICA RECUPERADA: Generar el nombre y resumen iniciales
+                val (gameName, summary) = generateInitialMetadata(firstAIMessage)
+                currentGameSession?.metadata?.gameName = gameName
+                currentGameSession?.metadata?.summary = summary
+                currentGameSession?.metadata?.lastUpdated = System.currentTimeMillis()
+
+                withContext(Dispatchers.Main) {
+                    tvStoryTitle.text = gameName
+                }
+
+                updateChatUI(currentGameSession!!.history)
+                saveGameSessionToFirebase()
+
+            } catch (e: Exception) {
+                Log.e("GeminiAI_Init", "Error al inicializar la partida", e)
+                updateChatUI(listOf(ChatMessage("Error al contactar al Oráculo.", Sender.MODEL)))
+            }
+        }
+    }
+
+    private fun loadExistingGame(gameId: String) {
+        db.collection("game_sessions").document(gameId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    try {
+                        val sessionJson = document.getString("sessionJson")
+                        val loadedSession = sessionJson?.let { json.decodeFromString<GameSession>(it) }
+                        if (loadedSession != null) {
+                            currentGameSession = loadedSession
+                            chatAdapter.updateMessages(currentGameSession!!.history)
+                            tvStoryTitle.text = loadedSession.metadata.gameName
+
+                            val metadata = currentGameSession!!.metadata
+                            val systemPrompt = buildCustomPrompt(metadata.userContext, metadata.userCharacter, metadata.tone, metadata.dialogueStyle)
+
+                            generativeModel = GenerativeModel(
+                                modelName = "gemini-2.5-flash", apiKey = retrievedApiKey!!,
+                                generationConfig = generationConfig { temperature = 0.9f; topK = 1; topP = 1f; maxOutputTokens = 2048 },
+                                systemInstruction = content("system") { text(systemPrompt) }
                             )
-                        )
-                        // 4. ACTUALIZACIÓN SEGURA con el resultado
-                        addMessageToChat(ChatMessage(firstAIMessage, Sender.MODEL), true)
-                    } else {
-                        throw IllegalStateException("La respuesta inicial de la IA fue nula o vacía.")
+
+                            val historyForAI = currentGameSession!!.history.map { content(if (it.sender == Sender.USER) "user" else "model") { text(it.text) } }
+                            chat = generativeModel!!.startChat(history = historyForAI)
+                            Toast.makeText(this, "Aventura '${metadata.gameName}' cargada.", Toast.LENGTH_SHORT).show()
+
+                        } else { throw IllegalStateException("La sesión cargada es nula.") }
+                    } catch (e: Exception) {
+                        Log.e("LoadGame", "Error al parsear o configurar la partida cargada", e)
+                        Toast.makeText(this, "Error al cargar la aventura.", Toast.LENGTH_SHORT).show()
+                        finish()
                     }
-                } catch (e: Exception) {
-                    Log.e("GeminiAI", "Error al generar la historia inicial", e)
-                    addMessageToChat(ChatMessage("Error al contactar al Oráculo. Intenta de nuevo.", Sender.MODEL), true)
+                } else {
+                    Log.e("LoadGame", "No se encontró el documento de la partida con ID: $gameId")
+                    Toast.makeText(this, "No se encontró la aventura.", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
             }
-        } catch (e: Exception) {
-            Log.e("GeminiAI", "Excepción al inicializar GenerativeModel", e)
-            addMessageToChat(ChatMessage("Error configurando IA: ${e.localizedMessage}", Sender.MODEL), true)
-            generativeModel = null
-            chat = null
+            .addOnFailureListener { e ->
+                Log.e("LoadGame", "Error al obtener la partida de Firestore", e)
+                Toast.makeText(this, "Error de conexión al cargar la aventura.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+    }
+
+    private fun sendMessage() {
+        val prompt = chatInputEditText.text.toString().trim()
+        if (prompt.isEmpty() || generativeModel == null || chat == null) return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val userMessage = ChatMessage(prompt, Sender.USER)
+            currentGameSession?.history?.add(userMessage)
+            val loadingMessage = ChatMessage("...", Sender.MODEL, isLoading = true)
+            currentGameSession?.history?.add(loadingMessage)
+            updateChatUI(currentGameSession!!.history)
+            withContext(Dispatchers.Main) { chatInputEditText.text.clear() }
+
+            try {
+                val response = chat!!.sendMessage(prompt)
+                val aiResponseText = response.text?.trim() ?: "El oráculo guarda silencio..."
+                val aiMessageObject = ChatMessage(aiResponseText, Sender.MODEL)
+
+                if (currentGameSession?.history?.isNotEmpty() == true) {
+                    currentGameSession?.history?.removeAt(currentGameSession!!.history.lastIndex)
+                }
+                currentGameSession?.history?.add(aiMessageObject)
+                updateChatUI(currentGameSession!!.history)
+
+                // LÓGICA RECUPERADA: Generar el nuevo resumen
+                val newSummary = generateNewSummary()
+                currentGameSession?.metadata?.summary = newSummary
+                currentGameSession?.metadata?.lastUpdated = System.currentTimeMillis()
+                saveGameSessionToFirebase()
+
+            } catch (e: Exception) {
+                Log.e("GeminiAI_Send", "Error al enviar mensaje", e)
+                if (currentGameSession?.history?.isNotEmpty() == true) {
+                    currentGameSession?.history?.removeAt(currentGameSession!!.history.lastIndex)
+                }
+                currentGameSession?.history?.add(ChatMessage("Error: ${e.message}", Sender.MODEL))
+                updateChatUI(currentGameSession!!.history)
+            }
         }
     }
 
-
-    // --- El resto de las funciones (buildDefaultPrompt, buildCustomPrompt, sendMessage, addMessageToChat, setupWindowInsets) permanecen exactamente iguales ---
-
-    private fun buildDefaultPrompt(): String {
-        return """
-        Eres un Dungeon Master narrando una historia en español. El jugador es el protagonista, y debes contarle la historia a este a través de la segunda persona.
-        No reveles que eres una IA. Mantén respuestas claras y breves (3-5 oraciones).
-        Comienza la aventura ahora con una introducción breve y una situación inicial para el jugador, inventando un escenario original cada vez.
+    private suspend fun generateInitialMetadata(storyText: String): Pair<String, String> {
+        val metadataPrompt = """
+            Basado en el siguiente texto: "$storyText"
+            Responde a estas dos preguntas en formato `KEY:[VALUE]`:
+            1. NAME:[Inventa un nombre épico y corto para esta aventura]
+            2. SUMMARY:[Escribe un resumen de una frase sobre la situación inicial]
         """.trimIndent()
+        try {
+            val response = generativeModel!!.generateContent(metadataPrompt)
+            val text = response.text ?: ""
+            Log.d("METADATA_DEBUG", "Respuesta para metadatos iniciales: $text")
+            val name = "NAME:\\[(.*?)]".toRegex(RegexOption.DOT_MATCHES_ALL).find(text)?.groups?.get(1)?.value?.trim() ?: "Aventura sin Nombre"
+            val summary = "SUMMARY:\\[(.*?)]".toRegex(RegexOption.DOT_MATCHES_ALL).find(text)?.groups?.get(1)?.value?.trim() ?: "Sin resumen."
+            return Pair(name, summary)
+        } catch (e: Exception) {
+            Log.e("GeminiAI_Meta", "Falló la generación de metadatos iniciales", e)
+            return Pair("Aventura sin Nombre", "Sin resumen.")
+        }
+    }
+
+    private suspend fun generateNewSummary(): String {
+        val historyText = currentGameSession?.history?.joinToString("\n") { "${it.sender}: ${it.text}" } ?: ""
+        val summaryPrompt = """
+            Considerando la siguiente historia:
+            "$historyText"
+            Escribe un nuevo resumen actualizado de la aventura en una sola frase, en formato `SUMMARY:[resumen]`.
+        """.trimIndent()
+        try {
+            val response = generativeModel!!.generateContent(summaryPrompt)
+            val text = response.text ?: ""
+            Log.d("METADATA_DEBUG", "Respuesta para resumen nuevo: $text")
+            return "SUMMARY:\\[(.*?)]".toRegex(RegexOption.DOT_MATCHES_ALL).find(text)?.groups?.get(1)?.value?.trim() ?: currentGameSession?.metadata?.summary ?: "Sin resumen."
+        } catch (e: Exception) {
+            Log.e("GeminiAI_Meta", "Falló la actualización del resumen", e)
+            return currentGameSession?.metadata?.summary ?: "Sin resumen."
+        }
+    }
+
+    private suspend fun updateChatUI(messages: List<ChatMessage>) {
+        withContext(Dispatchers.Main) {
+            chatAdapter.updateMessages(messages)
+            if (chatAdapter.itemCount > 0) {
+                chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+            }
+        }
+    }
+
+    private suspend fun saveGameSessionToFirebase() {
+        val session = currentGameSession ?: return
+        val sessionToSave = session.copy(history = session.history.filter { !it.isLoading }.toMutableList())
+
+        Log.d("FIRESTORE_SAVE", "Intentando guardar la partida: ${sessionToSave.metadata.gameId}")
+        try {
+            val sessionJsonString = json.encodeToString(GameSession.serializer(), sessionToSave)
+            Log.d("FIRESTORE_SAVE", "JSON a subir:\n$sessionJsonString")
+            val sessionData = mapOf("sessionJson" to sessionJsonString, "userId" to sessionToSave.metadata.userId)
+
+            db.collection("game_sessions").document(sessionToSave.metadata.gameId)
+                .set(sessionData, SetOptions.merge())
+                .addOnSuccessListener { Log.d("FIRESTORE_SAVE", "¡ÉXITO!") }
+                .addOnFailureListener { e -> Log.e("FIRESTORE_SAVE", "¡FALLO!", e) }
+        } catch (e: Exception) {
+            Log.e("FIRESTORE_SAVE", "Error CRÍTICO al serializar o guardar.", e)
+        }
     }
 
     private fun buildCustomPrompt(context: String, character: String, toneValue: Int, dialogueValue: Int): String {
@@ -186,80 +330,20 @@ class MainActivity : AppCompatActivity() {
             toneValue > 66 -> "muy cómico, ligero y hasta absurdo"
             else -> "balanceado, con momentos serios y toques de humor"
         }
-
         val dialogueDescription = when {
-            dialogueValue < 33 -> "casi puramente narrativo, con muy pocos diálogos. Enfócate en las descripciones y acciones"
-            dialogueValue > 66 -> "muy conversacional. La historia debe avanzar principalmente a través de diálogos con otros personajes"
+            dialogueValue < 33 -> "casi puramente narrativo, con muy pocos diálogos"
+            dialogueValue > 66 -> "muy conversacional, la historia avanza por diálogos"
             else -> "balanceado entre narrativa y diálogo"
         }
-
         return """
         Eres un Dungeon Master narrando una historia en español. Sigue estas reglas ESTRICTAMENTE:
-
-        1.  **Rol del Jugador:** El jugador es el protagonista. Nárra la historia en segunda persona (ej: "Tú ves...", "Sientes..."). El jugador es quien toma TODAS las decisiones. No asumas ninguna acción por él.
-
-        2.  **Contexto del Mundo:** La historia ocurre aquí: "${if (context.isNotBlank()) context else "un mundo de fantasía genérico"}".
-
-        3.  **Identidad del Protagonista:** El jugador es: "${if (character.isNotBlank()) character else "un aventurero anónimo"}". Debes reflejar esta identidad en la narración.
-
-        4.  **Tono de la Historia:** El tono debe ser ${toneDescription}.
-
-        5.  **Estilo Narrativo:** El estilo debe ser ${dialogueDescription}.
-
-        6.  **Formato:** Mantén respuestas claras y breves (3-5 oraciones). No reveles que eres una IA.
-
-        Comienza la aventura ahora con una introducción breve y una situación inicial para el jugador, respetando todos los puntos anteriores.
+        1.  **Rol del Jugador:** El jugador es el protagonista. Nárra la historia en segunda persona (ej: "Tú ves..."). El jugador toma TODAS las decisiones. No asumas acciones por él.
+        2.  **Contexto:** La historia ocurre aquí: "$context".
+        3.  **Protagonista:** El jugador es: "$character".
+        4.  **Tono:** El tono debe ser $toneDescription.
+        5.  **Estilo:** El estilo debe ser $dialogueDescription.
+        6.  **Formato:** Respuestas de 3-5 oraciones. No reveles que eres una IA.
+        Comienza la aventura ahora con una introducción breve y una situación inicial, respetando todos los puntos.
         """.trimIndent()
-    }
-
-    private fun sendMessage() {
-        val prompt = chatInputEditText.text.toString().trim()
-        if (prompt.isEmpty()) return
-
-        addMessageToChat(ChatMessage(prompt, Sender.USER))
-        chatInputEditText.text.clear()
-
-        if (chat == null) {
-            addMessageToChat(ChatMessage("Error: La IA no está lista. Reinicia la aventura.", Sender.MODEL))
-            return
-        }
-
-        addMessageToChat(ChatMessage("...", Sender.MODEL, isLoading = true))
-
-        lifecycleScope.launch {
-            try {
-                val response = chat!!.sendMessage(prompt)
-                response.text?.let { aiResponse ->
-                    addMessageToChat(ChatMessage(aiResponse, Sender.MODEL), true)
-                } ?: addMessageToChat(ChatMessage("Respuesta vacía recibida.", Sender.MODEL), true)
-            } catch (e: Exception) {
-                Log.e("GeminiAI", "Error generando contenido", e)
-                addMessageToChat(ChatMessage("Error: ${e.message}", Sender.MODEL), true)
-            }
-        }
-    }
-
-    private fun addMessageToChat(message: ChatMessage, isUpdate: Boolean = false) {
-        runOnUiThread {
-            if (isUpdate && chatMessages.isNotEmpty()) {
-                chatAdapter.updateLastMessage(message)
-            } else {
-                // Previene añadir duplicados si la lista ya tiene un mensaje de carga.
-                if (chatMessages.none { it.isLoading }) {
-                    chatAdapter.addMessage(message)
-                }
-            }
-            if (chatAdapter.itemCount > 0) {
-                chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
-            }
-        }
-    }
-
-    private fun setupWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 }

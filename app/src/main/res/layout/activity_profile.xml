@@ -6,131 +6,134 @@
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
 
-    <!-- Fondo (usa el mismo que el login) -->
+    <!-- Fondo -->
     <ImageView
-        android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="Imagen de fondo de fantasía"
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/fondologin" />
 
-    <Button
-        android:id="@+id/btnGoToCreateGame"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Crear Nueva Partida"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <!-- Overlay oscuro (usa el mismo) -->
+    <!-- Overlay oscuro -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000" />
+        android:background="#A6000000" />
 
-    <!-- Logo centrado (opcional, pero mantiene el estilo) -->
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="60dp"
-        android:alpha="0.8"
-        android:contentDescription="Logo Mythos"
-        android:src="@drawable/logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Caja de Perfil (adaptada de la caja de login) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/view2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/login_box_bg"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.60"
+    <!-- Botón volver -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Volver"
+        android:src="@drawable/ic_back_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95"
-        app:layout_constraintWidth_percent="0.9">
+        app:tint="@color/white" />
 
+    <!-- Caja de Perfil -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/login_box_bg"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.9">
 
         <TextView
             android:id="@+id/tvProfileTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:fontFamily="@font/notoserif"
-            android:text="Bienvenido"
-            android:textColor="@android:color/white"
-            android:textSize="28sp"
+            android:fontFamily="@font/notoserif_family"
+            android:text="Perfil de Aventurero"
+            android:textColor="@color/mythos_yellow"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Campo Email -->
+        <TextView
+            android:id="@+id/labelEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Email:"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvProfileTitle" />
+
+        <TextView
+            android:id="@+id/tvUserEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/labelEmail"
+            app:layout_constraintTop_toBottomOf="@id/labelEmail"
+            tools:text="pedro_el_capo@mythos.com" />
+
+        <!-- Campo Nombre de Usuario -->
+        <TextView
+            android:id="@+id/labelUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Nombre de Usuario:"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintStart_toStartOf="@id/tvUserEmail"
+            app:layout_constraintTop_toBottomOf="@id/tvUserEmail" />
+
         <TextView
             android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/notoserif"
             android:textColor="@color/white"
-            android:textSize="22sp"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvProfileTitle"
-            tools:text="pedro_test" />
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/labelUsername"
+            app:layout_constraintTop_toBottomOf="@id/labelUsername"
+            tools:text="PedroElCapo" />
 
+        <!-- Campo Partidas Creadas -->
+        <TextView
+            android:id="@+id/labelGamesCreated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Aventuras Creadas:"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintStart_toStartOf="@id/tvUsername"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername" />
 
         <TextView
-            android:id="@+id/tvCreationDate"
+            android:id="@+id/tvGamesCreatedCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:fontFamily="@font/notoserif"
-            android:text="Miembro desde el 03 de octubre de 2025"
-            android:textColor="#CCCCCC"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvUsername"
-            tools:text="Miembro desde el 03 de octubre de 2025" />
-
-        <Button
-            android:id="@+id/btnStartStory"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/custom_button"
-            android:fontFamily="@font/notoserif"
-            android:text="Comenzar Aventura"
-            android:textColor="@android:color/white"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvCreationDate"
-            app:layout_constraintWidth_percent="0.7" />
+            app:layout_constraintStart_toStartOf="@id/labelGamesCreated"
+            app:layout_constraintTop_toBottomOf="@id/labelGamesCreated"
+            tools:text="12" />
 
+        <!-- Botón de Cerrar Sesión -->
         <Button
             android:id="@+id/btnLogout"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:background="@android:color/transparent"
-            android:fontFamily="@font/notoserif"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/button_secondary_background"
             android:text="Cerrar Sesión"
-            android:textColor="#FF8A80"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvGamesCreatedCount" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

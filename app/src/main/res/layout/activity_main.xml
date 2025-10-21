@@ -11,60 +11,75 @@
     tools:context=".MainActivity">
 
     <!-- ============================================================= -->
-    <!-- HEADER AREA: Contiene el título y el botón de Login           -->
+    <!-- HEADER AREA: Ahora con botón de atrás y título dinámico      -->
     <!-- ============================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_area"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#1c1e21"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/mythos_base_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- BOTÓN DE VOLVER A LA HOMEPAGE -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Volver"
+            android:src="@drawable/ic_back_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
+
+        <!-- TÍTULO DE LA HISTORIA (CENTRADO) -->
         <TextView
-            android:id="@+id/textViewTitle"
+            android:id="@+id/tvStoryTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:ellipsize="end"
             android:fontFamily="serif"
-            android:text="Tu Historia"
+            android:gravity="center"
+            android:maxLines="1"
             android:textAlignment="center"
-            android:textColor="@android:color/white"
+            android:textColor="@color/mythos_yellow"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnGoLogin"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/btnProfile"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="La Caverna de los Ecos Perdidos" />
 
-        <Button
-            android:id="@+id/btnGoLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/custom_button"
-            android:minHeight="48dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="Login"
-            android:textColor="@color/white"
+        <!-- BOTÓN DE PERFIL (CONSISTENTE CON HOMEPAGE) -->
+        <ImageButton
+            android:id="@+id/btnProfile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Perfil"
+            android:src="@drawable/ic_profile_circle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- ============================================================= -->
-    <!-- CHAT RECYCLER VIEW: Ahora se ajusta entre el header y el input -->
+    <!-- CHAT RECYCLER VIEW: Sin cambios, se ajusta al nuevo header    -->
     <!-- ============================================================= -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
+        android:paddingBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/input_area_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,13 +87,14 @@
         tools:listitem="@layout/item_chat_message" />
 
     <!-- ============================================================= -->
-    <!-- INPUT AREA: Se mantiene en la parte inferior                  -->
+    <!-- INPUT AREA: Con el nuevo estilo de colores y botones          -->
     <!-- ============================================================= -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/input_area_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#1c1e21"
+        android:background="@color/mythos_base_gray"
+        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -87,35 +103,31 @@
             android:id="@+id/chatinput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/mythoschatinput"
-            android:ems="10"
+            android:autofillHints="no"
+            android:background="@drawable/input_field_background"
             android:fontFamily="serif"
-            android:hint="@string/qu_quieres_hacer_ahora"
+            android:hint="¿Qué quieres hacer ahora?"
             android:inputType="text"
-            android:padding="12dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="#A0A0A0"
+            android:padding="14dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/text_tertiary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/chatsend"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:importantForAutofill="no" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <ImageButton
             android:id="@+id/chatsend"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/custom_button"
-            android:text="Enviar"
-            android:textColor="@color/white"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/button_primary_background"
+            android:contentDescription="Enviar"
+            android:src="@android:drawable/ic_menu_send"
             app:layout_constraintBottom_toBottomOf="@+id/chatinput"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/chatinput" />
+            app:layout_constraintTop_toTopOf="@+id/chatinput"
+            app:tint="@color/black" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

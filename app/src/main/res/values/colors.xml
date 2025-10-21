@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <!-- Colores base de la app -->
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+    <!-- Tu paleta de colores personalizada -->
+    <color name="mythos_base_gray">#1c1e21</color> <!-- El gris base que me pasaste -->
+    <color name="mythos_highlight_gray">#2f3137</color> <!-- El gris secundario -->
+    <color name="mythos_yellow">#edae49</color> <!-- El amarillo principal -->
+    <color name="mythos_yellow_dark">#9a5616</color> <!-- El amarillo oscuro para bordes -->
+
+    <!-- Colores para botones secundarios -->
+    <color name="mythos_secondary_button_fill">#CC33333B</color> <!-- Gris con transparencia (CC = 80%) -->
+    <color name="mythos_secondary_button_stroke">#FFFFFF</color>
+
+    <!-- Otros colores de UI -->
+    <color name="text_secondary">#CCCCCC</color>
+    <color name="text_tertiary">#999999</color>
+    <color name="delete_red">#E57373</color>
 </resources>
