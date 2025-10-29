@@ -15,7 +15,9 @@
         <!-- CORRECCIÓN 1: HomePageActivity es la ÚNICA actividad de inicio (LAUNCHER) -->
         <activity
             android:name=".HomePageActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -43,6 +45,7 @@
             android:name=".RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.Mythos" />
+
 
         <activity
             android:name=".CreateGameActivity"

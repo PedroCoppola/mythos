@@ -1,89 +1,127 @@
 package com.mythos.mythos
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var db: FirebaseFirestore
+    // Declaramos la variable de Firebase Auth a nivel de clase
+    private lateinit var auth: FirebaseAuth
 
+    // Declaramos las vistas para accederlas más fácil
+    private lateinit var emailEditText: EditText
+    private lateinit var passwordEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.login_activity)
+        // La línea "enableEdgeToEdge()" puede dar problemas a veces, la comentamos
+        // si el layout se ve raro.
+        // enableEdgeToEdge()
+        setContentView(R.layout.activity_login)
 
-        val sharedPref = getSharedPreferences("MiAppPrefs", Context.MODE_PRIVATE)
-        val usuarioGuardado = sharedPref.getString("usuario", null)
-        if (usuarioGuardado != null) {
-            // ----- ¡CAMBIO CLAVE AQUÍ! -----
-            // Ahora te lleva a la pantalla de perfil, no a la de la historia
-            val intent = Intent(this, ProfileActivity::class.java)
+        // Inicializamos Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
+        // ---  VERIFICACIÓN DE SESIÓN INICIAL ---
+        // Si el usuario YA está logueado, lo mandamos directo a la HomePage sin que vea el login.
+        if (auth.currentUser != null) {
+            val intent = Intent(this, HomePageActivity::class.java)
             startActivity(intent)
-            finish()
-            return
+            finish() // Cierra LoginActivity para que no pueda volver atrás
+            return // Detiene la ejecución del onCreate para no hacer trabajo de más
         }
 
-        val edtUsuario = findViewById<EditText>(R.id.edtUsuario)
-        val edtPassword = findViewById<EditText>(R.id.edtPassword)
+        // --- Vinculación de Vistas con los IDs CORRECTOS del XML ---
+        // CORRECCIÓN: Usamos los IDs del layout que me pasaste
+        emailEditText = findViewById(R.id.edtEmailLogin)
+        passwordEditText = findViewById(R.id.edtPasswordLogin)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
-        val btnIrRegistro = findViewById<Button>(R.id.btnGoRegister)
-        // ESTA LÍNEA ES LA CORRECTA
+        val btnGoToRegister = findViewById<TextView>(R.id.btnGoToRegister)
         val btnBack: ImageButton = findViewById(R.id.btnBack)
+        val tvForgotPassword = findViewById<TextView>(R.id.tvForgotPassword)
 
-
-        db = FirebaseFirestore.getInstance()
-
-        btnIrRegistro.setOnClickListener {
+        // --- Listeners de los botones ---
+        btnGoToRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+            finish() // Cierra el login para no apilarlo
         }
 
         btnBack.setOnClickListener {
-            finish()
+            finish() // Cierra la actividad y vuelve a la anterior
         }
 
         btnLogin.setOnClickListener {
-            val usuario = edtUsuario.text.toString()
-            val contraseña = edtPassword.text.toString()
+            // Cuando se presiona "Ingresar", llamamos a nuestra función de lógica
+            loginUser()
+        }
 
-            if (usuario.isEmpty() || contraseña.isEmpty()){
-                Toast.makeText(this, "Por favor completar los campos", Toast.LENGTH_SHORT).show()
+        tvForgotPassword.setOnClickListener {
+            val email = emailEditText.text.toString().trim()
+
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Ingresá tu email para recuperar la contraseña.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            db.collection("usuarios").document(usuario).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()){
-                        val passwordDB = document.getString("contraseña")
-                        if (contraseña == passwordDB){
-                            val editor = sharedPref.edit()
-                            editor.putString("usuario", usuario)
-                            editor.apply()
-                            Toast.makeText(this, "bienvenido $usuario", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        } else{
-                            Toast.makeText(this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show()
-                        }
-                    } else{
-                        Toast.makeText(this, "El usuario no existe", Toast.LENGTH_SHORT).show()
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Te enviamos un mail para recuperar tu contraseña.", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "Error al enviar el mail: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        Log.e("LoginActivity", "Error al enviar mail de recuperación", task.exception)
                     }
-                } .addOnFailureListener {
-                    Toast.makeText(this, "error al conectar con firestore", Toast.LENGTH_SHORT).show()
                 }
         }
 
     }
 
+
+
+
+    /**
+     * Esta función contiene TODA la lógica para iniciar sesión
+     * usando Firebase Authentication.
+     */
+    private fun loginUser() {
+        val email = emailEditText.text.toString().trim()
+        val password = passwordEditText.text.toString().trim()
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Por favor, completa el email y la contraseña.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Esta es la llamada clave a Firebase Auth para iniciar sesión
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // --- LOGIN EXITOSO ---
+                    Log.d("LoginActivity", "signInWithEmail:success")
+                    Toast.makeText(this, "¡Bienvenido de vuelta!", Toast.LENGTH_SHORT).show()
+
+                    // Mandamos al usuario a la HomePage
+                    val intent = Intent(this, HomePageActivity::class.java)
+                    // Limpiamos la pila de actividades para que no pueda "volver" a la pantalla de login
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish() // Cierra LoginActivity
+
+                } else {
+                    // --- LOGIN FALLIDO ---
+                    Log.w("LoginActivity", "signInWithEmail:failure", task.exception)
+                    // Mostramos el mensaje de error que nos da Firebase
+                    Toast.makeText(this, "Error de autenticación: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
 }

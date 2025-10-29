@@ -17,6 +17,15 @@
         <!-- Color del texto -->
         <item name="android:textColor">@color/white</item>
     </style>
+
+    <!-- ... (Acá arriba están tus otros estilos como Theme.Mythos) ... -->
+
+    <!-- ============================================================= -->
+    <!-- TEMA PARA LA SPLASH SCREEN                                    -->
+    <!-- ============================================================= -->
+    <!-- En res/values/themes.xml -->
+
+
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
         <!-- Color de fondo del diálogo -->
         <item name="android:background">@color/mythos_highlight_gray</item>
@@ -31,6 +40,21 @@
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialog.Button</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialog.Button</item>
     </style>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- El fondo de pantalla completa (USA EL WRAPPER) -->
+        <item name="windowSplashScreenBackground">@drawable/splash_background</item>
+        <!-- El ícono que aparece en el centro -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/mythos</item>
+
+        <!-- Duración del ícono en pantalla -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+
+        <!-- El tema al que la app debe cambiar DESPUÉS de la splash -->
+        <item name="postSplashScreenTheme">@style/Theme.Mythos</item>
+    </style>
+
+
 
     <!-- Estilo para los botones dentro del diálogo -->
     <style name="AlertDialog.Button" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">

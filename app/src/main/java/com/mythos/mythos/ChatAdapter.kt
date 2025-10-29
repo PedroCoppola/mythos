@@ -48,12 +48,12 @@ class ChatAdapter(private val messages: MutableList<ChatMessage>) :
             // --- ESTILO PARA EL USUARIO ---
             holder.messageText.text = "> ${message.text}"
             holder.messageText.setTextColor(Color.parseColor("#eeba2b"))
-            holder.messageText.typeface = Typeface.DEFAULT_BOLD
+            holder.messageText.typeface = Typeface.SERIF
             holder.messageText.alpha = 1.0f
 
         } else { // Sender.MODEL
             // --- ESTILO PARA LA HISTORIA (MODELO) ---
-            holder.messageText.setTextColor(Color.WHITE)
+            holder.messageText.setTextColor(Color.parseColor("#F4F3F2"))
             holder.messageText.alpha = 1.0f
             try {
                 // He puesto 'notoserif' que es la fuente que usas en el login. ¡Cámbiala si es otra!

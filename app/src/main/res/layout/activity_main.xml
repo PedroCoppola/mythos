@@ -5,11 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/quelbin"
-    android:backgroundTint="#69000000"
+    android:background="@drawable/fondo"
+    android:backgroundTint="#B3000000"
     android:backgroundTintMode="src_atop"
     tools:context=".MainActivity">
 
+    <!-- ============================================================= -->
+    <!-- HEADER AREA: Ahora con botón de atrás y título dinámico      -->
+    <!-- ============================================================= -->
     <!-- ============================================================= -->
     <!-- HEADER AREA: Ahora con botón de atrás y título dinámico      -->
     <!-- ============================================================= -->
@@ -56,21 +59,33 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="La Caverna de los Ecos Perdidos" />
 
-        <!-- BOTÓN DE PERFIL (CONSISTENTE CON HOMEPAGE) -->
-        <ImageButton
+        <!-- BOTÓN DE PERFIL (CONSISTENTE CON HOMEPAGE Y AHORA REDONDO) -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/btnProfile"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Perfil"
-            android:src="@drawable/ic_profile_circle"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            android:contentDescription="Ir al perfil de usuario">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_profile_circle"
+                android:scaleType="centerCrop"
+                android:background="@color/mythos_highlight_gray"/>
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!-- ============================================================= -->
     <!-- CHAT RECYCLER VIEW: Sin cambios, se ajusta al nuevo header    -->

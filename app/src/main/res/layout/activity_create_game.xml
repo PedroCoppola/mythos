@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:contentDescription="Imagen de fondo de fantasía"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/fondologin" />
+        app:srcCompat="@drawable/green" />
 
     <!-- Overlay oscuro -->
     <View

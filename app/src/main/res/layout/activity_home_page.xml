@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/fondologin"
+        app:srcCompat="@drawable/yellow"
         tools:ignore="ContentDescription" />
 
     <!-- Overlay oscuro -->
@@ -23,7 +23,7 @@
         android:id="@+id/dark_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A6000000" /> <!-- Aumenté un poco la opacidad -->
+        android:background="#C9000000" /> <!-- Aumenté un poco la opacidad -->
 
     <!-- Título y Perfil -->
     <TextView
@@ -58,7 +58,6 @@
             android:layout_height="match_parent"
             android:src="@drawable/ic_profile_circle"
             android:scaleType="centerCrop"
-            app:tint="@color/white"
             android:background="@color/mythos_highlight_gray"/>
 
     </androidx.cardview.widget.CardView>

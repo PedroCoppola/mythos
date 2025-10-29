@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:contentDescription="Imagen de fondo de fantasía"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/fondologin" />
+        app:srcCompat="@drawable/blue" />
 
     <!-- Overlay oscuro -->
     <View
@@ -119,6 +119,20 @@
             app:layout_constraintEnd_toEndOf="@id/edtPasswordLogin"
             app:layout_constraintStart_toStartOf="@id/edtPasswordLogin"
             app:layout_constraintTop_toBottomOf="@id/edtPasswordLogin" />
+
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:text="¿Olvidaste tu contraseña? Recuperala"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="@id/btnLogin"
+            app:layout_constraintHorizontal_bias="0.51"
+            app:layout_constraintStart_toStartOf="@id/btnLogin"
+            app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
         <TextView
             android:id="@+id/btnGoToRegister"

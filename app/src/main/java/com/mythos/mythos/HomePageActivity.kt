@@ -18,6 +18,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.serialization.json.Json
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen // ¡ASEGÚRATE DE AÑADIR ESTE IMPORT!
 
 class HomePageActivity : AppCompatActivity() {
 
@@ -36,6 +38,11 @@ class HomePageActivity : AppCompatActivity() {
     private val json = Json { ignoreUnknownKeys = true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Instancia la splash antes del setContentView()
+        installSplashScreen()
+
+
+        // --- PASO 2: Continuar con la creación normal ---
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
