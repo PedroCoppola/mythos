@@ -43,15 +43,21 @@
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <!-- El fondo de pantalla completa (USA EL WRAPPER) -->
-        <item name="windowSplashScreenBackground">@drawable/splash_background</item>
-        <!-- El ícono que aparece en el centro -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/mythos</item>
 
-        <!-- Duración del ícono en pantalla -->
-        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <!-- 1. El color de fondo de toda la ventana. Negro sólido. -->
+        <item name="windowSplashScreenBackground">@android:color/black</item>
 
-        <!-- El tema al que la app debe cambiar DESPUÉS de la splash -->
+        <!--
+            2. El ícono que se mostrará en el centro.
+               AHORA USAMOS NUESTRO LAYER-LIST COMPATIBLE.
+        -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_drawable_layered</item>
+
+        <!-- 3. Colores de las barras del sistema -->
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+
+        <!-- 4. El tema al que la app debe cambiar DESPUÉS de la splash. -->
         <item name="postSplashScreenTheme">@style/Theme.Mythos</item>
     </style>
 
@@ -62,6 +68,7 @@
         <!-- Color del texto de los botones (ej: "Borrar", "Cancelar") -->
         <item name="android:textColor">@color/mythos_yellow</item>
     </style>
+
 
 
 </resources>

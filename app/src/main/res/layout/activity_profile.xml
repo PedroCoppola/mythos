@@ -2,26 +2,25 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
     tools:context=".ProfileActivity">
 
-    <!-- Fondo -->
+    <!-- Fondo y Overlay (Sin cambios) -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="Imagen de fondo de fantasía"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/purple" />
+        app:srcCompat="@drawable/fondologin" />
 
-    <!-- Overlay oscuro -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#A6000000" />
 
-    <!-- Botón volver -->
+    <!-- Botón volver (Sin cambios) -->
     <ImageButton
         android:id="@+id/btnBack"
         android:layout_width="48dp"
@@ -34,119 +33,155 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
 
-    <!-- Caja de Perfil -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Caja de Perfil (CON NUEVOS ESTILOS) -->
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/login_box_bg"
-        android:padding="24dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.85"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         app:layout_constraintWidth_percent="0.9">
 
-        <TextView
-            android:id="@+id/tvProfileTitle"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/notoserif_family"
-            android:text="Perfil de Aventurero"
-            android:textColor="@color/mythos_yellow"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@drawable/login_box_bg"
+            android:padding="24dp">
 
-        <!-- Campo Email -->
-        <TextView
-            android:id="@+id/labelEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Email:"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvProfileTitle" />
+            <TextView
+                android:id="@+id/tvProfileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/notoserif_family"
+                android:text="Perfil de Aventurero"
+                android:textColor="@color/mythos_yellow"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvUserEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@id/labelEmail"
-            app:layout_constraintTop_toBottomOf="@id/labelEmail"
-            tools:text="pedro_el_capo@mythos.com" />
+            <!-- Campo Email (Informativo) -->
+            <TextView
+                android:id="@+id/labelEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Correo de la cuenta"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvProfileTitle" />
 
-        <!-- Campo Nombre de Usuario -->
-        <TextView
-            android:id="@+id/labelUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Nombre de Usuario:"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="@id/tvUserEmail"
-            app:layout_constraintTop_toBottomOf="@id/tvUserEmail" />
+            <TextView
+                android:id="@+id/tvUserEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/labelEmail"
+                app:layout_constraintTop_toBottomOf="@id/labelEmail"
+                tools:text="pedro_el_capo@mythos.com" />
 
-        <TextView
-            android:id="@+id/tvUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@id/labelUsername"
-            app:layout_constraintTop_toBottomOf="@id/labelUsername"
-            tools:text="PedroElCapo" />
+            <!-- Campo Editable para Nombre de Usuario -->
+            <TextView
+                android:id="@+id/labelUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Nombre de Usuario:"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintStart_toStartOf="@id/tvUserEmail"
+                app:layout_constraintTop_toBottomOf="@id/tvUserEmail" />
 
-        <!-- Campo Partidas Creadas -->
-        <TextView
-            android:id="@+id/labelGamesCreated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Aventuras Creadas:"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="@id/tvUsername"
-            app:layout_constraintTop_toBottomOf="@id/tvUsername" />
+            <EditText
+                android:id="@+id/etUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/input_field_background"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/labelUsername"
+                app:layout_constraintTop_toBottomOf="@id/labelUsername"
+                tools:text="PedroElCapo" />
 
-        <TextView
-            android:id="@+id/tvGamesCreatedCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@id/labelGamesCreated"
-            app:layout_constraintTop_toBottomOf="@id/labelGamesCreated"
-            tools:text="12" />
+            <!-- Botón para guardar el nuevo nombre de usuario (sin cambios de estilo) -->
+            <Button
+                android:id="@+id/btnUpdateUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/button_primary_background"
+                android:text="Actualizar Nombre"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/etUsername"
+                app:layout_constraintStart_toStartOf="@id/etUsername"
+                app:layout_constraintTop_toBottomOf="@id/etUsername" />
 
-        <!-- Botón de Cerrar Sesión -->
-        <Button
-            android:id="@+id/btnLogout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/button_secondary_background"
-            android:text="Cerrar Sesión"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvGamesCreatedCount" />
+            <!-- Divisor visual -->
+            <View
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#B65D5D5D"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnUpdateUsername" />
 
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/button_secondary_background"
-            android:text="Eliminar Cuenta"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnLogout" />
+            <!-- Botón para restablecer contraseña (NUEVO ESTILO) -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnResetPassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/button_secondary_transparent"
+                android:text="Restablecer Contraseña"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Botón para cerrar sesión (NUEVO ESTILO) -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnLogout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/button_secondary_transparent"
+                android:text="Cerrar Sesión"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnResetPassword" />
+
+            <!-- Botón para ELIMINAR CUENTA (NUEVO ESTILO ROJO) -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDelete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/button_danger"
+                android:text="Eliminar Cuenta"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnLogout" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

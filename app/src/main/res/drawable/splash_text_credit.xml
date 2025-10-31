@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Este drawable "dibuja" el texto de los créditos usando una forma y un bitmap. -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="bottom|center_horizontal"
+    android:src="@drawable/ic_launcher_foreground"
+    android:tint="@android:color/white">
+
+    <!-- Este es un truco para crear texto en un drawable.
+         El <bitmap> actúa como un contenedor de texto. -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <size android:height="48dp" /> <!-- Altura del área de texto -->
+        </shape>
+    </item>
+
+    <item android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="Desarrollado por Pedro Coppola y Matías Molina"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
+    </item>
+
+</bitmap>

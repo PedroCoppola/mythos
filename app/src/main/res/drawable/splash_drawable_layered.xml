@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Este drawable usa un layer-list para crear un ícono con fondo.
+    Es compatible con todas las versiones de Android.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- CAPA 1: El fondo. Un color negro sólido que llena todo el espacio. -->
+    <item android:drawable="@android:color/black" />
+
+    <item
+        android:width="120dp"
+        android:height="120dp"
+        android:drawable="@drawable/mythosdos"
+        android:gravity="center" />
+
+
+</layer-list>
+    

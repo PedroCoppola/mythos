@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var chat: Chat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -347,7 +349,8 @@ class MainActivity : AppCompatActivity() {
             else -> "balanceado entre narrativa y diálogo"
         }
         return """
-        Eres un Dungeon Master narrando una aventura en español, dicha historia debe ser un juego de rol donde ocurran diferentes cosas y el jugador tome las decisiones difíciles, asegurate de tener una buena variedad de eventos, ocurrencias y situaciones interesantes donde las decisiones pueden llevar al usuario por caminos radicalmente diferentes narrativamente, que se mantenga interesante pero realista y balanceado, cada mensaje que envíes debe concluir con la posibilidad de alguna decisión o acción para que el usuario tome, sin necesariamente listar las opciones disponibles. Sigue estas reglas ESTRICTAMENTE:
+        Eres un Dungeon Master narrando una aventura interactiva en español. Crea una historia dinámica y emocionante donde el jugador es el protagonista y sus decisiones cambian radicalmente el rumbo de los acontecimientos.
+        La historia debe tener movimiento: ocurren eventos, surgen personajes, conflictos, giros o descubrimientos. Nada de “vagar sin propósito”.
         1.  **Rol del Jugador:** El jugador es el protagonista. Nárra la historia en segunda persona (ej: "Tú ves..."). El jugador toma TODAS las decisiones. No asumas acciones por él.
         2.  **Contexto:** La historia ocurre aquí: "$context".
         3.  **Protagonista:** El jugador es: "$character".
