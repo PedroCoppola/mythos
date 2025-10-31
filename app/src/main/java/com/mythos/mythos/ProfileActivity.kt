@@ -8,6 +8,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -33,6 +35,7 @@ class ProfileActivity : AppCompatActivity() {
         tvGamesCreatedCount = findViewById(R.id.tvGamesCreatedCount)
         val btnLogout: Button = findViewById(R.id.btnLogout)
         val btnBack: ImageButton = findViewById(R.id.btnBack)
+        val btnDelete: Button = findViewById(R.id.btnDelete)
 
         // Listeners
         btnBack.setOnClickListener {
@@ -43,7 +46,17 @@ class ProfileActivity : AppCompatActivity() {
             signOut()
         }
 
+        btnDelete.setOnClickListener {
+            deleteAccount()
+        }
+
         loadUserProfile()
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     private fun loadUserProfile() {
@@ -97,5 +110,30 @@ class ProfileActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun deleteAccount() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            // Si por alguna razón llega acá sin estar logueado, lo mandamos a la home.
+            Toast.makeText(this, "No hay usuario autenticado.", Toast.LENGTH_SHORT).show()
+            goToHomePage()
+            return
+        }
+
+        db.collection("usuarios").document(currentUser.uid).delete()
+            .addOnSuccessListener{
+                currentUser.delete()
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Cuenta eliminada correctamente", Toast.LENGTH_SHORT).show()
+                        goToHomePage()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al eliminar cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al eliminar datos ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }

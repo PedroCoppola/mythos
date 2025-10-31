@@ -75,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
             auth.sendPasswordResetEmail(email)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Te enviamos un mail para recuperar tu contraseña.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Te enviamos un mail para recuperar tu contraseña. Revisa tu bandeja de spam.", Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(this, "Error al enviar el mail: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         Log.e("LoginActivity", "Error al enviar mail de recuperación", task.exception)

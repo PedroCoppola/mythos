@@ -9,6 +9,7 @@
         <!-- Colores de Fondo y Superficies -->
         <item name="android:windowBackground">@color/mythos_base_gray</item>
         <item name="colorSurface">@color/mythos_highlight_gray</item>
+        <item name="android:statusBarColor">@color/mythos_base_gray</item>
 
         <!-- Fuente por Defecto para toda la App -->
         <item name="android:fontFamily">@font/notoserif_family</item>
